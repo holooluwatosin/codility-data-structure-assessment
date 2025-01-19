@@ -1,46 +1,86 @@
-The solution calculates the maximum number of direction changes (turns) encountered in a binary tree during a traversal from the root to the leaves. Here’s the approach I took:
+### Explanation of the Solution:
 
-### Approach
+The goal of this solution is to determine the **maximum zigzag length** in a binary tree. A zigzag path is a sequence of nodes where we alternate between going left and right (or vice versa) at each step.
 
-1. **Recursive Depth-First Search (DFS):**
-   I implemented a helper function, `dfs`, to traverse the tree recursively. This function keeps track of three parameters:
-   - The current node.
-   - The direction of traversal (`goingRight`), which indicates whether the current direction is right (`true`), left (`false`), or the initial state (`null`).
-   - The number of turns (`turns`) encountered so far.
+### Key Concepts:
+1. **Zigzag Definition**: A zigzag path alternates directions (e.g., left → right → left). If the direction remains the same (e.g., left → left), it's not considered part of a zigzag.
+2. **Recursive Traversal**: The solution uses a recursive function to traverse the tree and calculate the maximum zigzag length.
 
-2. **Handling Direction Changes:**
-   - If `goingRight` is `null`, this means no direction has been set yet, so I can explore both the left and right subtrees without incrementing the turn count.
-   - If the traversal continues in the same direction (left or right), I keep the current `turns` count unchanged.
-   - If the traversal changes direction, I increment the `turns` count by 1 to reflect the turn.
+---
 
-3. **Base Case:**
-   I included a base case where the recursion stops if the current node is `null`.
+### Approach Taken:
 
-4. **Updating the Maximum Turns:**
-   As the traversal progresses, I update a global variable `maxTurns` to store the maximum number of turns encountered during any path from the root to the leaves.
+#### 1. **Recursive Function:**
+   - The `traverse` function is used to explore the tree. It keeps track of:
+     - `node`: The current node being processed.
+     - `prevDir`: The direction we came from ('L' for left, 'R' for right, or `null` for the root).
+     - `turns`: The number of direction changes (zigzags) so far.
+   - If the current node is `null`, we return and stop processing.
 
-5. **Initializing the Traversal:**
-   I started the DFS from the root node with `goingRight` set to `null` and `turns` initialized to 0.
+#### 2. **Zigzag Calculation:**
+   - For each node, we:
+     - Move to the left child (`node.l`):
+       - If the previous direction was "right" (`prevDir === 'R'`), this counts as a zigzag turn (`turns + 1`).
+       - Otherwise, the path continues in the same direction (`turns` remains unchanged).
+     - Move to the right child (`node.r`):
+       - If the previous direction was "left" (`prevDir === 'L'`), this counts as a zigzag turn (`turns + 1`).
+       - Otherwise, the path continues in the same direction (`turns` remains unchanged).
 
-### Complexity Analysis
+#### 3. **Track Maximum Zigzag Length:**
+   - The variable `maxZigzag` keeps track of the longest zigzag path found during the traversal.
+   - At each recursive call, `Math.max(maxZigzag, turns)` updates this value.
 
-- **Time Complexity:** The algorithm runs in \(O(N)\), where \(N\) is the total number of nodes in the binary tree, since every node is visited once.
-- **Space Complexity:** The space complexity is \(O(H)\), where \(H\) is the height of the tree, as it represents the depth of the recursive call stack.
+#### 4. **Base Case (Edge Case):**
+   - If the tree (`T`) is empty, the function immediately returns `0` as there are no zigzag paths.
 
-### Example Walkthrough
+#### 5. **Initiate Traversal:**
+   - Start the recursion from the root node (`T`) with `prevDir` as `null` and `turns` as `0`.
 
-For a binary tree like this:
+---
+
+### Time and Space Complexity:
+
+#### **Time Complexity:**
+- **O(N)**, where `N` is the number of nodes in the tree.
+- Each node is visited once during the recursive traversal.
+
+#### **Space Complexity:**
+- **O(H)**, where `H` is the height of the tree.
+- This accounts for the recursive call stack, which grows to the height of the tree.
+
+---
+
+### Example Walkthrough:
+
+Consider the following tree:
 
 ```
-      1
-     / \
-    2   3
-   /   / \
-  4   5   6
+       1
+      / \
+     2   3
+    /     \
+   4       5
+    \     /
+     6   7
 ```
 
-The maximum turns occur along paths such as:
-- `1 → 2 → 4` (0 turns).
-- `1 → 3 → 5` or `1 → 3 → 6` (1 turn each).
+1. Starting at root (1):
+   - Move left to node (2) → No zigzag yet (`turns = 0`).
+2. At node (2):
+   - Move left to node (4) → No zigzag (`turns = 0`).
+   - Move right to node (6) → Zigzag detected (`turns = 1`).
+3. Back at root (1):
+   - Move right to node (3) → Zigzag detected (`turns = 1`).
+4. At node (3):
+   - Move right to node (5) → No zigzag (`turns = 1`).
+   - Move left to node (7) → Zigzag detected (`turns = 2`).
 
-The solution efficiently calculates this by exploring all paths and keeping track of turns for each.
+The longest zigzag in this tree is 2.
+
+---
+
+### Summary:
+
+- **Approach**: Use a recursive function to traverse the tree while tracking direction changes (zigzags).
+- **Strengths**: Efficient (O(N)) and handles edge cases (empty tree).
+- **Limitations**: Relies on recursion, which can cause stack overflow for very deep trees. A stack-based iterative solution could be used for optimization.
